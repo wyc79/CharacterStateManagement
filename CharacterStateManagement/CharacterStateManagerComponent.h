@@ -73,6 +73,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "State", meta = (ClampMin = "0"))
 	float NormalStateWalkThreshold = 10.f;
 
+	/** Horizontal speed below this threshold exits Sprinting. */
+	UPROPERTY(EditDefaultsOnly, Category = "State", meta = (ClampMin = "0"))
+	float SprintingMinSpeed = 600.f;
+
+	/** Target capsule half-height while crouched. */
+	UPROPERTY(EditDefaultsOnly, Category = "State", meta = (ClampMin = "0"))
+	float CrouchCapsuleHalfHeight = 44.f;
+
+	/** Cached default capsule half-height from BeginPlay. */
+	UPROPERTY(VisibleInstanceOnly, Category = "State")
+	float DefaultCapsuleHalfHeight = 0.f;
+
 	/** Switch to Idle or Walking based on current horizontal speed (e.g. call when landing from MidAir). */
 	void SwitchToNormalState();
 
@@ -101,6 +113,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 	virtual void ResetAnimTrigger(const FName& TriggerName);
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual void UpdateCapsuleHalfHeight(float NewHalfHeight, bool bUpdateOverlaps = true);
+
+	float GetDefaultCapsuleHalfHeight() const { return DefaultCapsuleHalfHeight; }
+	float GetCrouchCapsuleHalfHeight() const { return CrouchCapsuleHalfHeight; }
 
 protected:
 	void SetupIllegalTransitions();

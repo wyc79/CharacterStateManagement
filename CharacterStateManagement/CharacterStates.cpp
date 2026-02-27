@@ -137,6 +137,11 @@ void FSprintingState::Enter()
 
 void FSprintingState::Tick(float DeltaTime)
 {
+	const float HorizontalSpeed = StateManager->GetLinearVelocity().Size2D();
+	if (HorizontalSpeed < StateManager->SprintingMinSpeed)
+	{
+		StateManager->SwitchStateByEnum(ECharacterState::Walking);
+	}
 }
 
 void FSprintingState::Exit()
@@ -154,6 +159,7 @@ FCrouchState::FCrouchState(UCharacterStateManagerComponent* InOwner)
 void FCrouchState::Enter()
 {
 	LOG_STATE("Entering Crouch State");
+	StateManager->UpdateCapsuleHalfHeight(StateManager->GetCrouchCapsuleHalfHeight());
 	// StateManager->ResetAnimTrigger(FName("CrouchTrigger"));
 	// StateManager->SetAnimTrigger(FName("CrouchTrigger"));
 }
@@ -165,6 +171,11 @@ void FCrouchState::Tick(float DeltaTime)
 void FCrouchState::Exit()
 {
 	LOG_STATE("Exiting Crouch State");
+	const float DefaultHalfHeight = StateManager->GetDefaultCapsuleHalfHeight();
+	if (DefaultHalfHeight > 0.f)
+	{
+		StateManager->UpdateCapsuleHalfHeight(DefaultHalfHeight);
+	}
 	// StateManager->ResetAnimTrigger(FName("CrouchTrigger"));
 }
 

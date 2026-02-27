@@ -3,6 +3,7 @@
 #include "CharacterStateManagement/CharacterStates.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Engine/Engine.h"
@@ -22,6 +23,10 @@ void UCharacterStateManagerComponent::BeginPlay()
 		{
 			MeshComponent = Mesh;
 			AnimInstance = Mesh->GetAnimInstance();
+		}
+		if (UCapsuleComponent* Capsule = Char->GetCapsuleComponent())
+		{
+			DefaultCapsuleHalfHeight = Capsule->GetUnscaledCapsuleHalfHeight();
 		}
 	}
 
@@ -60,8 +65,6 @@ void UCharacterStateManagerComponent::TickComponent(float DeltaTime, ELevelTick 
 }
 
 
-// note: always check with transition matrix in Combat Design General Notion Page
-// https://www.notion.so/Combat-Design-General-2f14c4ee0575801a82bbc0c8a4f9afe8?source=copy_link
 void UCharacterStateManagerComponent::SetupIllegalTransitions()
 {
 	// Called once from BeginPlay(); transition rules are fixed for the lifetime of the component.
@@ -249,4 +252,13 @@ void UCharacterStateManagerComponent::SetAnimTrigger(const FName& TriggerName)
 void UCharacterStateManagerComponent::ResetAnimTrigger(const FName& TriggerName)
 {
 	// Override in subclass or wire to AnimBP.
+}
+
+void UCharacterStateManagerComponent::UpdateCapsuleHalfHeight(float NewHalfHeight, bool bUpdateOverlaps)
+{
+	ACharacter* Char = Cast<ACharacter>(GetOwner());
+	if (UCapsuleComponent* Capsule = Char ? Char->GetCapsuleComponent() : nullptr)
+	{
+		Capsule->SetCapsuleHalfHeight(NewHalfHeight, bUpdateOverlaps);
+	}
 }
